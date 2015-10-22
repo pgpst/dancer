@@ -72,7 +72,7 @@ export default class ChaCha20 {
 
 		this.input[12]++;
 		if (!this.input[12]) {
-			throw new Error('counter is exausted');
+			throw new Error('counter is exhausted');
 		}
 	}
 
