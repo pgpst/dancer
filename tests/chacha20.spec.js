@@ -118,6 +118,7 @@ describe('ChaCha20', () => {
 		it('should generate a proper stream #' + i, () => {
 			const poly = new ChaCha20(test.key, test.nonce);
 			const stream = poly.getBytes(test.stream.length);
+			console.log(stream);
 			expect(stream.equals(test.stream)).toBe(true);
 		});
 	});
