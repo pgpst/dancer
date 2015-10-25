@@ -2,7 +2,7 @@ import { ChaCha20 } from '../src/crypto';
 
 const testData = [
 	{
-		key: new Buffer(64),
+		key: new Buffer(32),
 		nonce: new Buffer(8),
 		stream: new Buffer([
 			0x76, 0xb8, 0xe0, 0xad, 0xa0, 0xf1, 0x3d, 0x90,
@@ -35,7 +35,7 @@ const testData = [
 		])
 	},
 	{
-		key: new Buffer(64),
+		key: new Buffer(32),
 		nonce: new Buffer([
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 		]),
@@ -51,7 +51,7 @@ const testData = [
 		])
 	},
 	{
-		key: new Buffer(64),
+		key: new Buffer(32),
 		nonce: new Buffer([
 			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		]),
@@ -118,7 +118,6 @@ describe('ChaCha20', () => {
 		it('should generate a proper stream #' + i, () => {
 			const poly = new ChaCha20(test.key, test.nonce);
 			const stream = poly.getBytes(test.stream.length);
-			console.log(stream);
 			expect(stream.equals(test.stream)).toBe(true);
 		});
 	});

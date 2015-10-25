@@ -241,22 +241,22 @@ function core(input, output) {
 
 	output.fill(0);
 
-	output.writeUInt32LE(x00, 0);
-	output.writeUInt32LE(x01, 4);
-	output.writeUInt32LE(x02, 8);
-	output.writeUInt32LE(x03, 12);
-	output.writeUInt32LE(x04, 16);
-	output.writeUInt32LE(x05, 20);
-	output.writeUInt32LE(x06, 24);
-	output.writeUInt32LE(x07, 28);
-	output.writeUInt32LE(x08, 32);
-	output.writeUInt32LE(x09, 36);
-	output.writeUInt32LE(x10, 40);
-	output.writeUInt32LE(x11, 44);
-	output.writeUInt32LE(x12, 48);
-	output.writeUInt32LE(x13, 52);
-	output.writeUInt32LE(x14, 56);
-	output.writeUInt32LE(x15, 60);
+	output.writeUInt32LE(uint32.addMod32(x00, input[0]), 0);
+	output.writeUInt32LE(uint32.addMod32(x01, input[1]), 4);
+	output.writeUInt32LE(uint32.addMod32(x02, input[2]), 8);
+	output.writeUInt32LE(uint32.addMod32(x03, input[3]), 12);
+	output.writeUInt32LE(uint32.addMod32(x04, input[4]), 16);
+	output.writeUInt32LE(uint32.addMod32(x05, input[5]), 20);
+	output.writeUInt32LE(uint32.addMod32(x06, input[6]), 24);
+	output.writeUInt32LE(uint32.addMod32(x07, input[7]), 28);
+	output.writeUInt32LE(uint32.addMod32(x08, input[8]), 32);
+	output.writeUInt32LE(uint32.addMod32(x09, input[9]), 36);
+	output.writeUInt32LE(uint32.addMod32(x10, input[10]), 40);
+	output.writeUInt32LE(uint32.addMod32(x11, input[11]), 44);
+	output.writeUInt32LE(uint32.addMod32(x12, input[12]), 48);
+	output.writeUInt32LE(uint32.addMod32(x13, input[13]), 52);
+	output.writeUInt32LE(uint32.addMod32(x14, input[14]), 56);
+	output.writeUInt32LE(uint32.addMod32(x15, input[15]), 60);
 
 	/* output[0] = x00;
 	output[1] = x01;
