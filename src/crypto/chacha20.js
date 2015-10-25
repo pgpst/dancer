@@ -1,8 +1,8 @@
-function rotate(v, c) {
-	return (v << c) | (v >>> (32 - c));
-}
+const constants = new Buffer('expand 32-byte k');
 
-var constants = new Buffer('expand 32-byte k');
+function rotate(value, step) {
+	return (value << step) | (value >>> (32 - step));
+}
 
 export default class ChaCha20 {
 	constructor(key, nonce) {
@@ -27,85 +27,102 @@ export default class ChaCha20 {
 		this.input[13] = nonce.readUInt32LE(0);
 		this.input[14] = nonce.readUInt32LE(4);
 		this.input[15] = nonce.readUInt32LE(8);
-		
+
 		this.cachePos = 64;
 		this.buffer = new Uint32Array(16);
 		this.output = new Buffer(64);
 	}
 
-	quarterRound(a, b, c, d) {
-		var x = this.buffer;
-		x[a] += x[b]; x[d] = rotate(x[d] ^ x[a], 16);
-		x[c] += x[d]; x[b] = rotate(x[b] ^ x[c], 12);
-		x[a] += x[b]; x[d] = rotate(x[d] ^ x[a],  8);
-		x[c] += x[d]; x[b] = rotate(x[b] ^ x[c],  7);
+	quarterRound(indexA, indexB, indexC, indexD) {
+		const buf = this.buffer;
+
+		buf[indexA] += buf[indexA];
+		buf[indexD] = rotate(buf[indexD] ^ buf[indexA], 16);
+
+		buf[indexC] += buf[indexC];
+		buf[indexB] = rotate(buf[indexB] ^ buf[indexC], 12);
+
+		buf[indexA] += buf[indexB];
+		buf[indexD] = rotate(buf[indexD] ^ buf[indexA], 8);
+
+		buf[indexC] += buf[indexD];
+		buf[indexB] = rotate(buf[indexB] ^ buf[indexC], 7);
 	}
 
 	makeBlock(output, start) {
-		var i = -1;
-		// copy input into working buffer
-		while (++i < 16) {
-			this.buffer[i] = this.input[i];
-		}
-		i = -1;
-		while (++i < 10) {
-			// straight round
-			this.quarterRound(0, 4, 8,12);
-			this.quarterRound(1, 5, 9,13);
-			this.quarterRound(2, 6,10,14);
-			this.quarterRound(3, 7,11,15);
+		let index = -1;
 
-			// diaganle round
-			this.quarterRound(0, 5,10,15);
-			this.quarterRound(1, 6,11,12);
-			this.quarterRound(2, 7, 8,13);
-			this.quarterRound(3, 4, 9,14);
+		// copy input into working buffer
+		while (++index < 16) {
+			this.buffer[index] = this.input[index];
 		}
-		i = -1;
+
+		index = -1;
+
+		while (++index < 10) {
+			// straight round
+			this.quarterRound(0, 4, 8, 12);
+			this.quarterRound(1, 5, 9, 13);
+			this.quarterRound(2, 6, 10, 14);
+			this.quarterRound(3, 7, 11, 15);
+
+			// diagonale round
+			this.quarterRound(0, 5, 10, 15);
+			this.quarterRound(1, 6, 11, 12);
+			this.quarterRound(2, 7, 8, 13);
+			this.quarterRound(3, 4, 9, 14);
+		}
+
+		index = -1;
 
 		// copy working buffer into output
-		while (++i < 16) {
-			this.buffer[i] += this.input[i];
-			output.writeUInt32LE(this.buffer[i], start);
-			start += 4;
+		while (++index < 16) {
+			this.buffer[index] += this.input[index];
+			output.writeUInt32LE(this.buffer[index], start);
+			start += 4; // eslint-disable-line no-param-reassign
 		}
 
 		this.input[12]++;
+
 		if (!this.input[12]) {
-			throw new Error('counter is exhausted');
+			throw new Error('Counter is exhausted');
 		}
 	}
 
 	getBytes(len) {
-		var dpos = 0;
-		var dst = new Buffer(len);
-		var cacheLen = 64 - this.cachePos;
+		let left = len;
+		let dpos = 0;
+		const dst = new Buffer(len);
+		const cacheLen = 64 - this.cachePos;
+
 		if (cacheLen) {
-			if (cacheLen >= len) {
+			if (cacheLen >= left) {
 				this.output.copy(dst, 0, this.cachePos, 64);
-				this.cachePos += len;
+				this.cachePos += left;
 				return dst;
-			} else {
-				this.output.copy(dst, 0, this.cachePos, 64);
-				len -= cacheLen;
-				dpos += cacheLen;
-				this.cachePos = 64;
 			}
+
+			this.output.copy(dst, 0, this.cachePos, 64);
+			left -= cacheLen;
+			dpos += cacheLen;
+			this.cachePos = 64;
 		}
-		while (len > 0 ) {
-			if (len <= 64) {
+
+		while (left > 0 ) {
+			if (left <= 64) {
 				this.makeBlock(this.output, 0);
-				this.output.copy(dst, dpos, 0, len);
-				if (len < 64) {
-					this.cachePos = len;
+				this.output.copy(dst, dpos, 0, left);
+				if (left < 64) {
+					this.cachePos = left;
 				}
 				return dst;
-			} else {
-				this.makeBlock(dst, dpos);
 			}
-			len -= 64;
+
+			this.makeBlock(dst, dpos);
+			left -= 64;
 			dpos += 64;
 		}
-		throw new Error('something bad happended');
+
+		throw new Error('Stream generation failure');
 	}
 }

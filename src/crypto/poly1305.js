@@ -1,6 +1,3 @@
-const Poly1305KeySize = 32;
-const Poly1305TagSize = 16;
-
 export default class Poly1305 {
 	constructor(key) {
 		this.buffer = new Buffer(16);
@@ -35,6 +32,55 @@ export default class Poly1305 {
 		this.leftover = 0;
 		this.finished = 0;
 	} 
+
+	blocks(m, mpos, bytes) {
+		var hibit = this.finished ? 0 : (1 << 11);
+		var t = new Uint16Array(8),
+			d = new Uint32Array(10),
+			c = 0, i = 0, j = 0;
+
+		while (bytes >= 16) {
+			for (i = 8; i--;)
+				t[i] = m.readUInt16LE(i*2+mpos);
+
+			this.h[0] +=   t[0]                         & 0x1fff;
+			this.h[1] += ((t[0] >>> 13) | (t[1] <<  3)) & 0x1fff;
+			this.h[2] += ((t[1] >>> 10) | (t[2] <<  6)) & 0x1fff;
+			this.h[3] += ((t[2] >>>  7) | (t[3] <<  9)) & 0x1fff;
+			this.h[4] += ((t[3] >>>  4) | (t[4] << 12)) & 0x1fff;
+			this.h[5] +=  (t[4] >>>  1)                 & 0x1fff;
+			this.h[6] += ((t[4] >>> 14) | (t[5] <<  2)) & 0x1fff;
+			this.h[7] += ((t[5] >>> 11) | (t[6] <<  5)) & 0x1fff;
+			this.h[8] += ((t[6] >>>  8) | (t[7] <<  8)) & 0x1fff;
+			this.h[9] +=  (t[7] >>>  5)                 | hibit;
+
+			for (i = 0, c = 0; i < 10; i++) {
+				d[i] = c;
+				for (j = 0; j < 10; j++) {
+					d[i] += (this.h[j] & 0xffffffff) * ((j <= i) ? this.r[i-j] : (5 * this.r[i+10-j]));
+					if (j === 4) {
+						c = (d[i] >>> 13);
+						d[i] &= 0x1fff;
+					}
+				}
+
+				c += (d[i] >>> 13);
+				d[i] &= 0x1fff;
+			}
+
+			c = ((c << 2) + c);
+			c += d[0];
+			d[0] = ((c & 0xffff) & 0x1fff);
+			c = (c >>> 13);
+			d[1] += c;
+
+			for (i = 10; i--;)
+				this.h[i] = d[i];
+
+			mpos += 16;
+			bytes -= 16;
+		}
+	}
 
 	update(m) {
 		var bytes = m.length;
@@ -155,9 +201,3 @@ export default class Poly1305 {
 		return mac;
 	}
 }
-
-function U16TO8_LE(p, pos, v) {
-	p[pos]   = v;
-	p[pos+1] = v >>> 8;
-}
-

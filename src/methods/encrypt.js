@@ -1,24 +1,27 @@
-import { ChaCha20, XOR, RandomArray } from '../crypto';
+import { ChaCha20, xor, randomArray } from '../crypto';
 
-export default encrypt(key, body) {
+export default function encrypt(key, body) {
 	return new Promise((resolve, reject) => {
 		try {
+			let keyArray = key;
+			let bodyArray = body;
+
 			if (!(key instanceof Uint8Array)) {
-				key = new Uint8Array(key);
+				keyArray = new Uint8Array(key);
 			}
 
 			if (!(body instanceof Uint8Array)) {
-				body = new Uint8Array(body);
+				bodyArray = new Uint8Array(body);
 			}
 
-			const nonce = RandomArray(8);
+			const nonce = randomArray(8);
 
-			const chacha = new ChaCha20(key, nonce);
-			const stream = chacha.getBytes(body.length);
+			const chacha = new ChaCha20(keyArray, nonce);
+			const stream = chacha.getBytes(bodyArray.length);
 
-			resolve(nonce, XOR(body, stream));
-		} catch(e) {
-			reject(e);
+			resolve(nonce, xor(body, stream));
+		} catch (error) {
+			reject(error);
 		}
 	});
 }

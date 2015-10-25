@@ -9,8 +9,8 @@ function response(event) {
 	postMessage(event);
 }
 
-self.onmessage = function(event) {
-	var msg = event.data;	
+self.onmessage = (event) => {
+	const msg = event.data;	
 
 	switch (msg.event) {
 	case 'seed-random':

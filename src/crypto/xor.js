@@ -1,9 +1,9 @@
-export default function XOR(a, b) {
-	const r = new Uint8Array();
-	
-	for (let i = 0; i < a.length; i++) {
-		r.push(a[i] ^ b[i]);
+export default function xor(arr1, arr2) {
+	const result = new Uint8Array();
+
+	for (let index = 0; index < arr1.length; index++) {
+		result.push(arr1[index] ^ arr2[index]);
 	}
 
-	return r;
+	return result;
 }
