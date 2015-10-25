@@ -3,33 +3,33 @@ import { Poly1305 } from '../crypto';
 export default function verify(key, tag, body) {
 	return new Promise((resolve, reject) => {
 		try {
-			let keyArray = key;
-			let tagArray = tag;
-			let bodyArray = body;
+			let keyBuf = key;
+			let tagBuf = tag;
+			let bodyBuf = body;
 
-			if (!(key instanceof Uint8Array)) {
-				keyArray = new Uint8Array(key);
+			if (!(key instanceof Buffer)) {
+				keyBuf = new Buffer(key);
 			}
 
-			if (!(tag instanceof Uint8Array)) {
-				tagArray = new Uint8Array(tag);
+			if (!(tag instanceof Buffer)) {
+				tagBuf = new Buffer(tag);
 			}
 
-			if (!(body instanceof Uint8Array)) {
-				bodyArray = new Uint8Array(body);
+			if (!(body instanceof Buffer)) {
+				bodyBuf = new Buffer(body);
 			}
 
-			const poly = new Poly1305(keyArray);
-			poly.update(bodyArray);
+			const poly = new Poly1305(keyBuf);
+			poly.update(bodyBuf);
 
 			const tag2 = poly.final();
 
 			if (tag.length !== tag2.length) {
-				return reject(new Error('Invariable tag lengths'));
+				return reject(new Error('Incorrect tag length'));
 			}
 
 			for (let index = 0; index < tag.length; index++) {
-				if (tagArray[index] !== tag2[index]) {
+				if (tagBuf[index] !== tag2[index]) {
 					return reject(new Error('Incorrect tag'));
 				}
 			}

@@ -3,24 +3,24 @@ import { ChaCha20, xor } from '../crypto';
 export default function decrypt(key, nonce, body) {
 	return new Promise((resolve, reject) => {
 		try {
-			let keyArray = key;
-			let nonceArray = nonce;
-			let bodyArray = body;
+			let keyBuf = key;
+			let nonceBuf = nonce;
+			let bodyBuf = body;
 
-			if (!(key instanceof Uint8Array)) {
-				keyArray = new Uint8Array(key);
+			if (!(key instanceof Buffer)) {
+				keyBuf = new Buffer(key);
 			}
 
-			if (!(nonce instanceof Uint8Array)) {
-				nonceArray = new Uint8Array(nonce);
+			if (!(nonce instanceof Buffer)) {
+				nonceBuf = new Buffer(nonce);
 			}
 
-			if (!(body instanceof Uint8Array)) {
-				bodyArray = new Uint8Array(body);
+			if (!(body instanceof Buffer)) {
+				bodyBuf = new Buffer(body);
 			}
 
-			const chacha = new ChaCha20(keyArray, nonceArray);
-			const stream = chacha.getBytes(bodyArray.length);
+			const chacha = new ChaCha20(keyBuf, nonceBuf);
+			const stream = chacha.getBytes(bodyBuf.length);
 
 			resolve(xor(body, stream));
 		} catch (error) {
