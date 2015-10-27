@@ -1,14 +1,9 @@
 import uint32 from 'uint32';
 
 const constants = new Buffer('expand 32-byte k');
-/*
-function rotate(value, step) {
-	return (value << step)) | (value >>> (32 - step));
-}
-*/
 
 export default class ChaCha20 {
-	constructor(key, nonce) {
+	constructor(key, nonce, counter) {
 		this.state = new Uint32Array(16);
 
 		this.state[0] = constants.readUInt32LE(0);
@@ -25,8 +20,13 @@ export default class ChaCha20 {
 		this.state[10] = key.readUInt32LE(24);
 		this.state[11] = key.readUInt32LE(28);
 
-		this.state[12] = 0;
-		this.state[13] = 0;
+		if (counter) {
+			this.state[12] = counter[0];
+			this.state[13] = counter[1];
+		} else {
+			this.state[12] = 0;
+			this.state[13] = 0;
+		}
 
 		this.state[14] = nonce.readUInt32LE(0);
 		this.state[15] = nonce.readUInt32LE(4);
@@ -78,44 +78,6 @@ export default class ChaCha20 {
 
 		return result;
 	}
-/*
-	getBytes(len) {
-		let left = len;
-		let dpos = 0;
-		const dst = new Buffer(len);
-		const cacheLen = 64 - this.cachePos;
-
-		if (cacheLen) {
-			if (cacheLen >= left) {
-				this.output.copy(dst, 0, this.cachePos, 64);
-				this.cachePos += left;
-				return dst;
-			}
-
-			this.output.copy(dst, 0, this.cachePos, 64);
-			left -= cacheLen;
-			dpos += cacheLen;
-			this.cachePos = 64;
-		}
-
-		while (left > 0 ) {
-			if (left <= 64) {
-				this.makeBlock(this.output, 0);
-				this.output.copy(dst, dpos, 0, left);
-				if (left < 64) {
-					this.cachePos = left;
-				}
-				return dst;
-			}
-
-			this.makeBlock(dst, dpos);
-			left -= 64;
-			dpos += 64;
-		}
-
-		throw new Error('Stream generation failure');
-	}
-*/
 }
 
 function core(input, output) {
@@ -257,21 +219,4 @@ function core(input, output) {
 	output.writeUInt32LE(uint32.addMod32(x13, input[13]), 52);
 	output.writeUInt32LE(uint32.addMod32(x14, input[14]), 56);
 	output.writeUInt32LE(uint32.addMod32(x15, input[15]), 60);
-
-	/* output[0] = x00;
-	output[1] = x01;
-	output[2] = x02;
-	output[3] = x03;
-	output[4] = x04;
-	output[5] = x05;
-	output[6] = x06;
-	output[7] = x07;
-	output[8] = x08;
-	output[9] = x09;
-	output[10] = x10;
-	output[11] = x11;
-	output[12] = x12;
-	output[13] = x13;
-	output[14] = x14;
-	output[15] = x15; */
 }
