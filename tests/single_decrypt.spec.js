@@ -1,7 +1,5 @@
 import {
 	decrypt,
-	encrypt,
-	verify,
 } from '../src/dancer';
 
 const testData = [
