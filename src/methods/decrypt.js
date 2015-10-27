@@ -1,4 +1,5 @@
 import { ChaCha20, xor } from '../crypto';
+import { Promise } from 'es6-promise';
 
 export default function decrypt(key, nonce, body) {
 	return new Promise((resolve, reject) => {

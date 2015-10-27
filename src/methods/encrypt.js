@@ -1,4 +1,5 @@
 import { ChaCha20, xor, randomBuffer } from '../crypto';
+import { Promise } from 'es6-promise';
 
 export default function encrypt(key, body) {
 	return new Promise((resolve, reject) => {

@@ -1,4 +1,5 @@
 import { Poly1305 } from '../crypto';
+import { Promise } from 'es6-promise';
 
 export default function verify(key, tag, body) {
 	return new Promise((resolve, reject) => {
