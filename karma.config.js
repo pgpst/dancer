@@ -6,7 +6,7 @@ module.exports = function(config) {
 			reporters: [
 				{ type: 'text-summary' },
 				{ type: 'html', subdir: 'coverage' },
-				{ type: 'lcov' }
+				{ type: 'lcov', subdir: 'lcov' }
 			],
 		},
 		files: [

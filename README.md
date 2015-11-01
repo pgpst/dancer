@@ -1,2 +1,2 @@
-# dancer [![Build Status](https://travis-ci.org/pgpst/dancer.svg?branch=master)](https://travis-ci.org/pgpst/dancer)
+# dancer [![Build Status](https://travis-ci.org/pgpst/dancer.svg?branch=master)](https://travis-ci.org/pgpst/dancer) [![Coverage Status](https://coveralls.io/repos/pgpst/dancer/badge.svg?branch=master&service=github)](https://coveralls.io/github/pgpst/dancer?branch=master) ![Dependency status](https://david-dm.org/pgpst/dancer.svg) 
 Pooled WebWorker library for ChaCha20+Poly1305 decryption in single part and chunked modes.
