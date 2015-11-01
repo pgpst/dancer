@@ -2,10 +2,11 @@ module.exports = function(config) {
 	config.set({
 		browsers: ['PhantomJS'],
 		coverageReporter: {
-			dir: 'build',
+			dir: 'coverage',
 			reporters: [
 				{ type: 'text-summary' },
-				{ type: 'html', subdir: 'coverage' }
+				{ type: 'html', subdir: 'coverage' },
+				{ type: 'lcov' }
 			],
 		},
 		files: [
