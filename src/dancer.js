@@ -1,4 +1,4 @@
-import { chacha20, poly1305, random } from './crypto';
+import crypto from './crypto';
 import { verify, decrypt, encrypt } from './methods';
 /* import {
 	verify as verifyChunked,
@@ -8,9 +8,7 @@ import { verify, decrypt, encrypt } from './methods';
 
 // Prepare the dancer object
 const dancer = {
-	chacha20,
-	poly1305,
-	random,
+	crypto,
 	verify,
 	decrypt,
 	encrypt,

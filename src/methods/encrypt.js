@@ -1,27 +1,30 @@
-import { ChaCha20, Poly1305, xor, randomBuffer } from '../crypto';
+import { ChaCha20, Poly1305, xor } from '../crypto';
 import { Promise } from 'es6-promise';
 
-export default function encrypt(key, body) {
+export default function encrypt(key, nonce, body) {
 	return new Promise((resolve, reject) => {
 		try {
 			let keyBuf = key;
+			let nonceBuf = nonce;
 			let bodyBuf = body;
 
 			if (!(key instanceof Buffer)) {
 				keyBuf = new Buffer(key);
 			}
 
+			if (!(nonce instanceof Buffer)) {
+				nonceBuf = new Buffer(nonce);
+			}
+
 			if (!(body instanceof Buffer)) {
 				bodyBuf = new Buffer(body);
 			}
 
-			const nonce = randomBuffer(8);
-
 			// Set up a new stream
-			const chacha = new ChaCha20(keyBuf, nonce);
+			const chacha = new ChaCha20(keyBuf, nonceBuf);
 
 			// Get the key for Poly1305 encryption
-			const polyKey = chacha20.getBytes(32);
+			const polyKey = chacha.getBytes(32);
 
 			// Get the bytes for rest of the encryption
 			const stream = chacha.getBytes(bodyBuf.length);
@@ -35,7 +38,7 @@ export default function encrypt(key, body) {
 			const tag = poly.finish();
 
 			// Resolve the promise
-			resolve(nonce, tag, cipher);
+			resolve([tag, cipher]);
 		} catch (error) {
 			reject(error);
 		}
